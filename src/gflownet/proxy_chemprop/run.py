@@ -91,5 +91,5 @@ def main():
 if __name__ == "__main__":
     main()
 
-"""python run.py --project_name "SCAFFOLD_RANDOM" --scaling False --batch_size 248 --message_hidden_dim 300 --depth 2 --dropout 0.2 --activation_mpnn 'relu' --aggregation 'mean' --hidden_dim_readout 64 --hidden_layers_readout 1 --dropout_readout 0.2 --batch_norm False --max_epochs 2 --init_lr 0.0001 --max_lr 0.001 --final_lr 0.00001
+"""python run.py --project_name "SCAFFOLD_BALANCED" --scaling False --batch_size 248 --message_hidden_dim 300 --depth 2 --dropout 0.2 --activation_mpnn 'relu' --aggregation 'mean' --hidden_dim_readout 64 --hidden_layers_readout 1 --dropout_readout 0.2 --batch_norm False --max_epochs 2 --init_lr 0.0001 --max_lr 0.001 --final_lr 0.00001
 """

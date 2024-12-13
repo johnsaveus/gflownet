@@ -13,11 +13,14 @@ from chemprop import data, featurizers, models, nn
 # TODO: When used for gpu training change the project name to create new one
 
 
-def set_seed():
-    random.seed(42)
-    np.random.seed(42)
-    torch.manual_seed(42)
-    torch.cuda.manual_seed(42)
+def set_seed(seed: int = 42):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 def setup_run(args):
@@ -61,9 +64,7 @@ def load_data(input_path, smiles_col, target_col):
     smiles = df.loc[:, smiles_col].values
     target = df.loc[:, target_col].values
 
-    all_data = [
-        data.MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(smiles, target)
-    ]
+    all_data = [data.MoleculeDatapoint.from_smi(smi, y) for smi, y in zip(smiles, target)]
 
     return all_data
 
@@ -88,16 +89,12 @@ def get_split(all_data: list, split_type: str, split_size: tuple[float, float, f
     train_indices, val_indices, test_indices = data.make_split_indices(
         mols, split_type, split_size
     )  # unpack the tuple into three separate lists
-    train_data, val_data, test_data = data.split_data_by_indices(
-        all_data, train_indices, val_indices, test_indices
-    )
+    train_data, val_data, test_data = data.split_data_by_indices(all_data, train_indices, val_indices, test_indices)
 
     return train_data, val_data, test_data
 
 
-def create_datasets(
-    train_data: list, val_data: list, test_data: list, scaling: bool = False
-):
+def create_datasets(train_data: list, val_data: list, test_data: list, scaling: bool = False):
     featurizer = featurizers.SimpleMoleculeMolGraphFeaturizer()
     train_dataset = data.MoleculeDataset(train_data[0], featurizer)
     val_dataset = data.MoleculeDataset(val_data[0], featurizer)
@@ -111,18 +108,12 @@ def create_datasets(
     return train_dataset, val_dataset, test_dataset, scaler
 
 
-def create_dataloader(
-    train_dataset, val_dataset, test_dataset, batch_size, num_workers
-):
-    train_loader = data.build_dataloader(train_dataset, batch_size, num_workers)
+def create_dataloader(train_dataset, val_dataset, test_dataset, batch_size, num_workers):
+    train_loader = data.build_dataloader(train_dataset, batch_size, num_workers, seed=42)
 
-    val_loader = data.build_dataloader(
-        val_dataset, batch_size, num_workers, shuffle=False
-    )
+    val_loader = data.build_dataloader(val_dataset, batch_size, num_workers, shuffle=False)
 
-    test_loader = data.build_dataloader(
-        test_dataset, batch_size, num_workers, shuffle=False
-    )
+    test_loader = data.build_dataloader(test_dataset, batch_size, num_workers, shuffle=False)
 
     return train_loader, val_loader, test_loader
 
@@ -233,9 +224,7 @@ def plot(real, preds):
         label="Validation",
         marker="^",
     )
-    plt.scatter(
-        real["test"], preds["test"], color="red", alpha=0.7, label="Test", marker="s"
-    )
+    plt.scatter(real["test"], preds["test"], color="red", alpha=0.7, label="Test", marker="s")
 
     all_values = np.concatenate(
         [
@@ -299,14 +288,8 @@ def predict(train_loader, val_loader, test_loader, model: models.MPNN):
             accelerator="cpu",
             devices="auto",  # 1 for cpu , 'auto' for everything else
         )
-        train_preds = [
-            el[0] for batch in trainer.predict(model, train_loader) for el in batch
-        ]
-        val_preds = [
-            el[0] for batch in trainer.predict(model, val_loader) for el in batch
-        ]
-        test_preds = [
-            el[0] for batch in trainer.predict(model, test_loader) for el in batch
-        ]
+        train_preds = [el[0] for batch in trainer.predict(model, train_loader) for el in batch]
+        val_preds = [el[0] for batch in trainer.predict(model, val_loader) for el in batch]
+        test_preds = [el[0] for batch in trainer.predict(model, test_loader) for el in batch]
 
     return train_preds, val_preds, test_preds

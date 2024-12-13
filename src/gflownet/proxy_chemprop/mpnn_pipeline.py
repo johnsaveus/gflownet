@@ -206,8 +206,9 @@ def ready_trainer(max_epochs: int = 100):
         logger=True,
         enable_checkpointing=True,  # Use `True` if you want to save model checkpoints. The checkpoints will be saved in the `checkpoints` folder.
         enable_progress_bar=True,
-        accelerator="auto",
-        devices="auto",
+        accelerator="gpu",
+        devices=-1,
+        deterministic=True,
         max_epochs=max_epochs,  # number of epochs to train for
         callbacks=[
             checkpointing,

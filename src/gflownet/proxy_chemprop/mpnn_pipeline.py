@@ -108,18 +108,37 @@ def create_datasets(train_data: list, val_data: list, test_data: list, scaling: 
     return train_dataset, val_dataset, test_dataset, scaler
 
 
+def seed_worker(worker_id):
+    # worker_id is automatically provided by PyTorch
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+
+
 def create_dataloader(train_dataset, val_dataset, test_dataset, batch_size, num_workers):
-    train_loader = data.build_dataloader(train_dataset, batch_size, num_workers, seed=42)
+    g = torch.Generator()
+    g.manual_seed(42)
+    train_loader = data.build_dataloader(
+        train_dataset, batch_size, num_workers, seed=42, worker_init_fn=seed_worker, generator=g
+    )
 
-    val_loader = data.build_dataloader(val_dataset, batch_size, num_workers, shuffle=False)
+    val_loader = data.build_dataloader(
+        val_dataset, batch_size, num_workers, shuffle=False, worker_init_fn=seed_worker, generator=g
+    )
 
-    test_loader = data.build_dataloader(test_dataset, batch_size, num_workers, shuffle=False)
+    test_loader = data.build_dataloader(
+        test_dataset, batch_size, num_workers, shuffle=False, worker_init_fn=seed_worker, generator=g
+    )
 
     return train_loader, val_loader, test_loader
 
 
 def recreate_train_loader(train_dataset, batch_size, num_workers):
-    return data.build_dataloader(train_dataset, batch_size, num_workers, shuffle=False)
+    g = torch.Generator()
+    g.manual_seed(42)
+    return data.build_dataloader(
+        train_dataset, batch_size, num_workers, shuffle=False, worker_init_fn=seed_worker, generator=g
+    )
 
 
 def message_passing(args):

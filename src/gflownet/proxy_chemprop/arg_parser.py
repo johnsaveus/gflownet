@@ -17,7 +17,7 @@ def ready_parser():
         default=True,
     )
     parser.add_argument("--batch_size", type=int, help="Batch size for training-val", default=64)
-    parser.add_argument("--num_workers", type=str, help="Number of workers for dataloader", default="auto")
+    parser.add_argument("--num_workers", type=int, help="Number of workers for dataloader", default=4)
     # MPNN hyperparameters
     parser.add_argument("--message_hidden_dim", type=int, help="Hidden dim for message", default=128)
     parser.add_argument("--depth", type=int, help="Depth of MPNN", default=3)

@@ -81,11 +81,7 @@ def evaluate_and_infer_model(
 def main():
     args = ready_parser().parse_args()
     print("Starting training pipeline...")
-    try:
-        train_and_evaluate(args)
-    except Exception as e:
-        print(f"Error during execution: {e}")
-    print("Pipeline finished!")
+    train_and_evaluate(args)
 
 
 if __name__ == "__main__":

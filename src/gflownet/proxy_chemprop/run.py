@@ -17,7 +17,7 @@ def train_and_evaluate(args):
     # Data Preparation
     print("Loading data...")
     all_data = load_data(INPUT_PATH, SMILES_COL, TARGET_COL)
-    train_data, val_data, test_data = get_split(all_data, args.project_name, SPLIT_SIZE)
+    train_data, val_data, test_data = get_split(all_data, SPLIT_SIZE)
     train_dataset, val_dataset, test_dataset, scaler = create_datasets(train_data, val_data, test_data, args.scaling)
     train_loader, val_loader, test_loader = create_dataloader(
         train_dataset, val_dataset, test_dataset, args.batch_size, args.num_workers

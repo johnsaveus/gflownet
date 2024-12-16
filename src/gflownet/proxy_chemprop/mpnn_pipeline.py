@@ -84,10 +84,10 @@ def get_activation(fn: str):
         raise ValueError(f"Activation function {fn} not supported")
 
 
-def get_split(all_data: list, split_type: str, split_size: tuple[float, float, float]):
+def get_split(all_data: list, split_size: tuple[float, float, float]):
     mols = [d.mol for d in all_data]
     train_indices, val_indices, test_indices = data.make_split_indices(
-        mols, split_type, split_size
+        mols, "SCAFFOLD_BALANCED", split_size
     )  # unpack the tuple into three separate lists
     train_data, val_data, test_data = data.split_data_by_indices(all_data, train_indices, val_indices, test_indices)
 
@@ -143,9 +143,10 @@ def recreate_train_loader(train_dataset, batch_size, num_workers):
 
 def message_passing(args):
     activation = get_activation(args.activation_mpnn)
-    return nn.AtomMessagePassing(
+    return nn.BondMessagePassing(
         d_h=args.message_hidden_dim,
         depth=args.depth,
+        undirected=args.undirected,
         dropout=args.dropout,
         activation=activation,
     )

@@ -20,6 +20,7 @@ def ready_parser():
     parser.add_argument("--num_workers", type=int, help="Number of workers for dataloader", default=4)
     # MPNN hyperparameters
     parser.add_argument("--message_hidden_dim", type=int, help="Hidden dim for message", default=128)
+    parser.add_argument("--undirected", type=bool, help="Hidden dim for message", default=False)
     parser.add_argument("--depth", type=int, help="Depth of MPNN", default=3)
     parser.add_argument("--dropout", type=float, help="Dropout for MPNN", default=0.1)
     parser.add_argument(

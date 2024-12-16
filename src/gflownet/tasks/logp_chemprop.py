@@ -19,12 +19,13 @@ from gflownet.online_trainer import StandardOnlineTrainer
 from gflownet.utils.conditioning import TemperatureConditional
 from gflownet.utils.misc import get_worker_device
 from gflownet.utils.transforms import to_logreward
-from gflownet.gnn_predictor.mpnn import GraphTransformer, load_mpnn_to_gflow, mol2graph
-from gflownet.proxy_chemprop.mpnn_pipeline import load_model, get_best_checkpoint
+
+# from gflownet.gnn_predictor.mpnn import GraphTransformer, load_mpnn_to_gflow, mol2graph
+from gflownet.proxy_chemprop.mpnn_pipeline import load_model
 from chemprop.featurizers import SimpleMoleculeMolGraphFeaturizer
 from chemprop import data
 
-CKP_PATH = "../proxy_chemprop/checkpoints/best-epoch=1-val_loss=0.39.ckpt"
+CKP_PATH = "../proxy_chemprop/checkpoints/best-epoch=84-val_loss=0.06.ckpt"
 
 
 class LogPTask(GFNTask):

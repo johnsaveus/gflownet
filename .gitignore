@@ -102,7 +102,7 @@ __pypackages__/
 wandb/
 lightning_logs/
 logs/
-checkpoints/
+#checkpoints
 gnn_predictor/
 *.ipynb
 # Celery stuff

@@ -143,7 +143,7 @@ def recreate_train_loader(train_dataset, batch_size, num_workers):
 
 def message_passing(args):
     activation = get_activation(args.activation_mpnn)
-    return nn.BondMessagePassing(
+    return nn.AtomMessagePassing(
         d_h=args.message_hidden_dim,
         depth=args.depth,
         undirected=args.undirected,
@@ -224,7 +224,39 @@ def get_best_checkpoint(trainer: pl.Trainer):
 
 
 def load_model(checkpoint: str):
-    return models.MPNN.load_from_checkpoint(checkpoint)
+    # Needs change for gpu
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    checkpoint_data = torch.load(checkpoint, map_location=device)
+    hp = checkpoint_data["hyper_parameters"]
+    print(checkpoint_data["state_dict"].keys())
+    # Message passing configs
+    mp_hp = hp["message_passing"]
+    del mp_hp["cls"]
+    mp = nn.AtomMessagePassing(**mp_hp)
+    # Aggregation configs
+    agg = nn.SumAggregation()
+    # Readout MLP configs
+    ffn_hp = hp["predictor"]
+    del ffn_hp["cls"]
+    predictor = nn.RegressionFFN(**ffn_hp)
+    mpnn = models.MPNN(
+        mp,
+        agg,
+        predictor,
+        hp["batch_norm"],
+        metrics=[
+            nn.metrics.RMSE(),
+            nn.metrics.MAE(),
+            nn.metrics.MSE(),
+            nn.metrics.R2Score(),
+        ],
+        init_lr=5e-4,
+        max_lr=5e-3,
+        final_lr=5e-5,
+    )
+    mpnn.load_state_dict(checkpoint_data["state_dict"])
+    return mpnn
+    # return models.MPNN.load_from_checkpoint(checkpoint, map_location=torch.device("cpu"))
 
 
 def plot(real, preds):

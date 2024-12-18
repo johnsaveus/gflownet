@@ -47,7 +47,7 @@ class LogPTask(GFNTask):
 
     def _load_task_models(self):
         # Load MPNN Model from Chemprop with best ckp
-        model = load_model(self.mpnn_ckp_path).to(get_worker_device())
+        model = load_model(self.mpnn_ckp_path)  # .to(get_worker_device())
         model = self._wrap_model(model)
         return {"logp": model}
 
@@ -61,6 +61,7 @@ class LogPTask(GFNTask):
 
     def compute_reward_from_graph(self, graphs) -> Tensor:
         batch = data.BatchMolGraph(graphs)
+        batch.to(self.models["logp"].device if hasattr(self.models["logp"], "device") else get_worker_device())
         preds = self.models["logp"](batch).reshape((-1,)).data.cpu()  # Why here was /8
         preds[preds.isnan()] = 0
         return preds.clip(1e-4, 100).reshape((-1,))

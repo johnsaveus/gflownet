@@ -1,0 +1,77 @@
+desc: Test
+log_dir: ./logs/debug_run_seh_frag_2025-01-22_12-59-41
+device: cpu
+seed: 42
+validate_every: 100
+checkpoint_every: null
+store_all_checkpoints: false
+print_every: 5
+start_at_step: 0
+num_final_gen_steps: 10
+num_validation_gen_steps: 10
+num_training_steps: 1000
+num_workers: 0
+hostname: 1845cd3d3c4a
+pickle_mp_messages: false
+git_hash: e4f00ac
+overwrite_existing_exp: true
+
+algo:
+  method: TB
+  num_from_policy: 64
+  num_from_dataset: 0
+  valid_num_from_policy: 64
+  valid_num_from_dataset: 0
+  max_nodes: 9
+  illegal_action_logreward: -75.0
+  train_random_action_prob: 0.05
+  valid_random_action_prob: 0.05
+  sampling_tau: 0.05
+  tb:
+    bootstrap_own_reward: false
+    epsilon: null
+    reward_loss_multiplier: 1.0
+    variant: TB
+    do_correct_idempotent: false
+    do_parameterize_p_b: false
+    do_predict_n: true
+    do_sample_p_b: true
+    do_length_normalize: false
+    subtb_max_len: 128
+    Z_learning_rate: 0.001
+    Z_lr_decay: 50000.0
+    cum_subtb: true
+    loss_fn: MSE
+    loss_fn_par: 1.0
+    n_loss: none
+    n_loss_multiplier: 1.0
+    backward_policy: Uniform
+model:
+  num_layers: 4
+  num_emb: 64
+  dropout: 0.0
+  graph_transformer:
+    num_heads: 4
+    ln_type: pre
+    num_mlp_layers: 1
+    concat_heads: true
+opt:
+  opt: adam
+  learning_rate: 0.0001
+  lr_decay: 20000.0
+  weight_decay: 1.0e-08
+  momentum: 0.9
+  clip_grad_type: norm
+  clip_grad_param: 10.0
+  adam_eps: 1.0e-08
+task:
+  logp:
+    reduced_frag: false
+cond:
+  valid_sample_cond_info: true
+  temperature:
+    sample_dist: uniform
+    dist_params:
+    - 0
+    - 64.0
+    num_thermometer_dim: 32

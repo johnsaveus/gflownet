@@ -1,3 +1,5 @@
+import os
+import yaml
 import socket
 from typing import Callable, Dict, List, Optional, Tuple, Union
 import torch
@@ -8,6 +10,7 @@ from rdkit.Chem.rdchem import Mol as RDMol
 from rdkit import Chem
 from torch import Tensor
 from gflownet import GFNTask, LogScalar, ObjectProperties
+from gflownet.utils.yaml_utils import yml2cfg
 from gflownet.config import Config, init_empty
 from gflownet.envs.frag_mol_env import FragMolBuildingEnvContext
 from gflownet.models import bengio2021flow
@@ -93,7 +96,6 @@ class LogPTask(GFNTask):
                 -1,
             )
         )
-        print(preds)
         return preds
 
     def compute_obj_properties(self, mols: List[RDMol]) -> Tuple[ObjectProperties, Tensor]:
@@ -117,38 +119,6 @@ class LogPTrainer(StandardOnlineTrainer):
 
     def set_default_hps(self, cfg: Config):
         cfg.hostname = socket.gethostname()
-        cfg.pickle_mp_messages = False
-        # For my laptop
-        cfg.num_workers = 0
-        cfg.opt.learning_rate = 1e-4
-        cfg.opt.weight_decay = 1e-8
-        cfg.opt.momentum = 0.9
-        cfg.opt.adam_eps = 1e-8
-        cfg.opt.lr_decay = 20_000
-        cfg.opt.clip_grad_type = "norm"
-        cfg.opt.clip_grad_param = 10
-        cfg.algo.num_from_policy = 64
-        cfg.model.num_emb = 128
-        cfg.model.num_layers = 4
-
-        cfg.algo.method = "TB"
-        cfg.algo.max_nodes = 9
-        cfg.algo.sampling_tau = 0.05
-        cfg.algo.illegal_action_logreward = -75
-        cfg.algo.train_random_action_prob = 0.05
-        cfg.algo.valid_random_action_prob = 0.05
-        cfg.algo.valid_num_from_policy = 64
-        cfg.num_validation_gen_steps = 10
-        cfg.algo.tb.epsilon = None
-        cfg.algo.tb.bootstrap_own_reward = False
-        cfg.algo.tb.Z_learning_rate = 1e-3
-        cfg.algo.tb.Z_lr_decay = 50_000
-        cfg.algo.tb.do_parameterize_p_b = False
-        cfg.algo.tb.do_sample_p_b = True
-
-        cfg.replay.use = False
-        cfg.replay.capacity = 10_000
-        cfg.replay.warmup = 1_000
 
     def setup_task(self):
         self.task = LogPTask(
@@ -165,28 +135,12 @@ class LogPTrainer(StandardOnlineTrainer):
 
     def setup(self):
         super().setup()
-        # self.training_data.setup(self.task, self.ctx)
 
 
 def main():
     """Example of how this model can be run."""
-    import datetime
-
-    config = init_empty(Config())
-    config.print_every = 1
-    config.log_dir = f"./logs/debug_run_seh_frag_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-    config.device = "cuda" if torch.cuda.is_available() else "cpu"
-    config.overwrite_existing_exp = True
-    config.num_training_steps = 1_000
-    config.validate_every = 100
-    config.num_final_gen_steps = 10
-    config.num_workers = 0
-    config.opt.lr_decay = 20_000
-    config.algo.sampling_tau = 0.05
-    config.cond.temperature.sample_dist = "beta"
-    config.cond.temperature.dist_params = [2.0, 32.0]
-    config.cond.temperature.num_thermometer_dim = 32
-
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logp.yaml")
+    config = yml2cfg(file_path)
     trial = LogPTrainer(config)
     trial.run()
 

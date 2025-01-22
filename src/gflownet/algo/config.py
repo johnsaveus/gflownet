@@ -100,7 +100,7 @@ class TBConfig(StrictDataClass):
     variant: TBVariant = TBVariant.TB
     do_correct_idempotent: bool = False
     do_parameterize_p_b: bool = False
-    do_predict_n: bool = False
+    do_predict_n: bool = True
     do_sample_p_b: bool = False
     do_length_normalize: bool = False
     subtb_max_len: int = 128

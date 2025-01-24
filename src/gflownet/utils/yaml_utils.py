@@ -1,8 +1,7 @@
+import yaml
 from dataclasses import is_dataclass, fields
 from typing import Type, Any
-import yaml
-from functools import lru_cache
-from gflownet.config import Config, init_empty
+from gflownet.config import Config
 
 
 def dict2cls(data_class: Type, data: dict) -> Any:

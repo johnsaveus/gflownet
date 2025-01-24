@@ -74,22 +74,16 @@ class LogPTask(GFNTask):
         return {"logp": model}
 
     def sample_conditional_information(self, n: int, train_it: int) -> Dict[str, Tensor]:
-        # Needs check
         return self.temperature_conditional.sample(n)
 
     def cond_info_to_logreward(self, cond_info: Dict[str, Tensor], flat_reward: ObjectProperties) -> LogScalar:
-        # Needs check
         return LogScalar(self.temperature_conditional.transform(cond_info, to_logreward(flat_reward)))
 
     def compute_reward_from_graph(self, loader) -> Tensor:
         trainer = pl.Trainer(logger=None, enable_progress_bar=True, accelerator="cpu", devices=1)
         preds = trainer.predict(self.models["logp"], loader)[0].reshape((-1)).data.cpu()
-        # batch = data.BatchMolGraph(graphs)
-        # batch.to(self.models["logp"].device if hasattr(self.models["logp"], "device") else get_worker_device())
-        # preds = self.models["logp"](batch).reshape((-1,)).data.cpu()  # Why here was /8
         preds[preds.isnan()] = 0
         preds = (
-            # self.reward_transform(preds)
             self.reward_transform(preds)
             .clip(1e-4, 10)
             .reshape(
@@ -105,7 +99,6 @@ class LogPTask(GFNTask):
         test_dset = data.MoleculeDataset(test_data, featurizer=self.featurizer)
         test_loader = data.build_dataloader(test_dset, shuffle=False)
         ###
-        # graphs = [self.featurizer(mol) for mol in mols]
         is_valid = torch.tensor([i is not None for i in test_dset]).bool()
         if not is_valid.any():
             return ObjectProperties(torch.zeros((0, 1))), is_valid
@@ -139,10 +132,24 @@ class LogPTrainer(StandardOnlineTrainer):
 
 def main():
     """Example of how this model can be run."""
+    import wandb
+
+    # Need to init and GFNTrainer will automatically log to wandb
+    wandb.login()
+    wandb.init(project="gflow_test")
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logp.yaml")
     config = yml2cfg(file_path)
     trial = LogPTrainer(config)
     trial.run()
+    # Read SQL
+    from gflownet.utils.sqlite_log import read_all_results
+
+    results = read_all_results(config.log_dir + "/valid")
+    wandb.finish()
+    # Need to decide what to log in wandb
+    # 1) online_loss which is the same as tb_loss
+    # 2) sampled_reward_avg
+    # 3) smiles and reward on every validation. Eventually we want to see the distribution over time
 
 
 if __name__ == "__main__":

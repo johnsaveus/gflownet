@@ -142,9 +142,9 @@ def main():
     trial = LogPTrainer(config)
     trial.run()
     # Read SQL
-    from gflownet.utils.sqlite_log import read_all_results
+    # from gflownet.utils.sqlite_log import read_all_results
 
-    results = read_all_results(config.log_dir + "/valid")
+    # results = read_all_results(config.log_dir + "/valid")
     wandb.finish()
     # Need to decide what to log in wandb
     # 1) online_loss which is the same as tb_loss

@@ -13,6 +13,4 @@ cd gflownet
 
 pip install --upgrade pip setuptools wheel
 pip install -e . --find-links https://data.pyg.org/whl/torch-2.1.2+cu121.html
-#pip install chemprop
-#pip install matplotlib
 cd src/gflownet/tasks

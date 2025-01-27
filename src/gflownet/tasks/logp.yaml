@@ -1,6 +1,6 @@
 desc: Test
 log_dir: ./logs/run
-device: cpu
+device: cuda
 seed: 42
 validate_every: 50
 checkpoint_every: null
@@ -9,8 +9,8 @@ print_every: 5
 start_at_step: 0
 num_final_gen_steps: 10
 num_validation_gen_steps: 5
-num_training_steps: 500
-num_workers: 0
+num_training_steps: 10
+num_workers: 2
 hostname: 1845cd3d3c4a
 pickle_mp_messages: false
 git_hash: e4f00ac

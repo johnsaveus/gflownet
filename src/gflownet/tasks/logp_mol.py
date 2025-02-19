@@ -12,7 +12,7 @@ from torch import Tensor
 from gflownet import GFNTask, LogScalar, ObjectProperties
 from gflownet.utils.yaml_utils import yml2cfg
 from gflownet.config import Config, init_empty
-from gflownet.envs.frag_mol_env import FragMolBuildingEnvContext
+from gflownet.envs.mol_building_env import MolBuildingEnvContext
 from gflownet.models import bengio2021flow
 from gflownet.online_trainer import StandardOnlineTrainer
 from gflownet.utils.conditioning import TemperatureConditional
@@ -120,10 +120,16 @@ class LogPTrainer(StandardOnlineTrainer):
         )
 
     def setup_env_context(self):
-        self.ctx = FragMolBuildingEnvContext(
-            max_frags=self.cfg.algo.max_nodes,
+        from rdkit.Chem.rdchem import ChiralType
+
+        self.ctx = MolBuildingEnvContext(
+            atoms=["C", "O"],  #
+            chiral_types=[ChiralType.CHI_UNSPECIFIED],
+            expl_H_range=[0, 1],
+            charges=[-1, 0, 1],
+            allow_explicitly_aromatic=False,
+            allow_5_valence_nitrogen=False,
             num_cond_dim=self.task.num_cond_dim,
-            fragments=bengio2021flow.FRAGMENTS_18 if self.cfg.task.seh.reduced_frag else bengio2021flow.FRAGMENTS,
         )
 
     def setup(self):
@@ -135,10 +141,10 @@ def main():
     import wandb
 
     # Need to init and GFNTrainer will automatically log to wandb
-    wandb.login()
-    wandb.init(project="gflow_test")
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logp.yaml")
     config = yml2cfg(file_path)
+    wandb.login()
+    wandb.init(project="gflow_mol_building", config=config)
     trial = LogPTrainer(config)
     trial.run()
     # Read SQL

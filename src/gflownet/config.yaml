@@ -1,5 +1,5 @@
 desc: Mol_building
-log_dir: ./logs/4_nodes
+log_dir: ./logs/run
 device: cpu
 seed: 42
 validate_every: 100

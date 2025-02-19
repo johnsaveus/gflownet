@@ -76,7 +76,10 @@ dependencies = [
     "omegaconf>=2.3",
     "wandb",
     "pandas", # needed for QM9 and HDF5 support.
-    "matplotlib"
+    "matplotlib",
+    "fastapi",
+    "uvicorn",
+    "jaqpot-api-client",
 ]
 
 [project.optional-dependencies]

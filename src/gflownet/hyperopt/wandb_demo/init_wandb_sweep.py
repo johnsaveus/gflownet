@@ -1,18 +1,16 @@
 import os
 import sys
 import time
-
 import wandb
-
 from gflownet.config import Config, init_empty
-from gflownet.tasks.seh_frag_moo import SEHMOOFragTrainer
+from gflownet.tasks.logp_frag import LogPTrainer
 
 TIME = time.strftime("%m-%d-%H-%M")
-ENTITY = "valencelabs"
+ENTITY = "ioannis-savvas00-national-technical-university-of-athens"
 PROJECT = "gflownet"
 SWEEP_NAME = f"{TIME}-sehFragMoo-Zlr-Zlrdecay"
-STORAGE_DIR = f"~/storage/wandb_sweeps/{SWEEP_NAME}"
-
+# Set this in my path
+STORAGE_DIR = os.path.expanduser(f"~/Documents/wandb_sweeps/{SWEEP_NAME}")
 
 # Define the search space of the sweep
 sweep_config = {
@@ -21,7 +19,7 @@ sweep_config = {
     "controller": {
         "type": "cloud",
     },
-    "method": "grid",
+    "method": "bayes",
     "parameters": {
         "config.algo.tb.Z_learning_rate": {"values": [1e-4, 1e-3, 1e-2]},
         "config.algo.tb.Z_lr_decay": {"values": [2_000, 50_000]},
@@ -69,5 +67,5 @@ if __name__ == "__main__":
     else:
         wandb.init(entity=ENTITY, project=PROJECT)
         config = wandb_config_merger()
-        trial = SEHMOOFragTrainer(config)
+        trial = LogPTrainer(config)
         trial.run()

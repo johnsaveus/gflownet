@@ -1,0 +1,2 @@
+Average pairwise Tanimoto similarity (MACCS): 0.3885
+Standard deviation of pairwise Tanimoto similarity (MACCS): 0.1345

@@ -23,19 +23,19 @@ from jaqpot_api_client.models.prediction_response import PredictionResponse
 class ModelService:
     def __init__(self, cfg):
         self.current_dir = Path(".").resolve()
-        cfg = self.current_dir / "tasks" / "logs" / "run" / "config.yaml"
+        cfg = "/home/john-savvas/Documents/gflownet/src/gflownet/tasks/logs/run/config.yaml"
         self.cfg = OmegaConf.load(cfg)
         self.featurizer = SimpleMoleculeMolGraphFeaturizer()
-        self._load_proxy("best-epoch=84-val_loss=0.06.ckpt")
-        self._load_sampling(run_name="run")
+        self._load_proxy()
+        self._load_sampling()
         self._load_algo()
 
-    def _load_proxy(self, proxy_ckp):
-        proxy_dir = self.current_dir / "proxy_chemprop" / "checkpoints" / proxy_ckp
+    def _load_proxy(self):
+        proxy_dir = "/home/john-savvas/Documents/gflownet/src/gflownet/proxy_chemprop/checkpoints/best-epoch=84-val_loss=0.06.ckpt"
         self.proxy = load_model(proxy_dir)
 
-    def _load_sampling(self, run_name):
-        model_dir = self.current_dir / "tasks" / "logs" / run_name / "model_state.pt"
+    def _load_sampling(self):
+        model_dir = "/home/john-savvas/Documents/gflownet/src/gflownet/tasks/logs/run/model_state.pt"
         self.temp_cond = TemperatureConditional(self.cfg)
         num_cond_dim = self.temp_cond.encoding_size()
         self.ctx = FragMolBuildingEnvContext(
@@ -67,20 +67,28 @@ class ModelService:
         return smiles
 
     def predict(self, request) -> PredictionResponse:
-        if request > 10:
+        num = request.dataset.input[0]["numGenerations"]
+        if num > 50:
             print("Too many samples. Please enter a number less than 10")
         else:
-            smiles = self.get_smiles(request)
+            smiles = self.get_smiles(num)
             test_data = [data.MoleculeDatapoint.from_smi(smile) for smile in smiles]
             test_dset = data.MoleculeDataset(test_data, featurizer=self.featurizer)
             test_loader = data.build_dataloader(test_dset, shuffle=False)
             trainer = pl.Trainer(logger=None, enable_progress_bar=True, accelerator="cpu", devices=1)
             preds = trainer.predict(self.proxy, test_loader)[0]
-        result = [{"smiles": smile, "proxy_pred": float(pred)} for pred, smile in zip(preds, smiles)]
 
+        result = [
+            {
+                "smiles": smile,
+                "prediction": round(float(pred), 3),
+                "jaqpotMetadata": {"jaqpotRowId": request.dataset.input[0]["jaqpotRowId"]},
+            }
+            for pred, smile in zip(preds, smiles)
+        ]
         return PredictionResponse(predictions=result)
 
 
 if __name__ == "__main__":
     model = ModelService("config.yaml")
-    print(model.predict(5))
+    # print(model.predict())

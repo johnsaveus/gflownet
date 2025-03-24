@@ -75,6 +75,8 @@ dependencies = [
     "omegaconf>=2.3",
     "wandb",
     "pandas", # needed for QM9 and HDF5 support.
+    "matplotlib",
+    "seaborn"
 ]
 
 [project.optional-dependencies]

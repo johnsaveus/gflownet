@@ -9,6 +9,9 @@ MODEL_PATH = "checkpoints/best-epoch=84-val_loss=0.06.ckpt"
 
 model = load_model(MODEL_PATH)
 smiles_from_data = [
+    "OCC1CC(C2=CCCCC2)CC(C2CCCC(C3CCOC3)C2)C1",
+    "c1cc(C2CCCC(C3CCCCC3n3nccc3C3CCCCC3)C2)ncn1",
+    "CC(=O)c1ccccc1C1CCCCC1c1ccc(-c2ccccc2)s1",
     "CCON=C(C)c1cccc(Oc2nc(OC)cc(OC)n2)c1C(=O)OC",  # 13045 . value = 2.36
     "CCON=C(CC)C1C(=O)CC(c2cccc(Oc3ccc(Cl)c(Cl)c3)c2)CC1=O",  # 13046 . value = 6.92
 ]

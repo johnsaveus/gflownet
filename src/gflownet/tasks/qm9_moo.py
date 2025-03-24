@@ -256,7 +256,7 @@ class QM9MOOTrainer(QM9GapTrainer):
             assert cond_cfg.weighted_prefs.preference_type is None, (
                 f"Cannot use preferences with multiple focus regions, "
                 f"here focus_type={cond_cfg.focus_region.focus_type} "
-                f"and preference_type={cond_cfg.weighted_prefs.preference_type }"
+                f"and preference_type={cond_cfg.weighted_prefs.preference_type}"
             )
 
         if isinstance(cond_cfg.focus_region.focus_type, list) and len(cond_cfg.focus_region.focus_type) > 1:
@@ -305,6 +305,7 @@ class QM9MOOTrainer(QM9GapTrainer):
 
     def setup_data(self):
         self.training_data = QM9Dataset(self.cfg.task.qm9.h5_path, train=True, targets=self.cfg.task.qm9_moo.objectives)
+        print(len(self.training_data))
         self.test_data = QM9Dataset(self.cfg.task.qm9.h5_path, train=False, targets=self.cfg.task.qm9_moo.objectives)
         self.to_terminate.append(self.training_data.terminate)
         self.to_terminate.append(self.test_data.terminate)

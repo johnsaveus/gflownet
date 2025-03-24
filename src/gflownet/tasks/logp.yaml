@@ -1,15 +1,15 @@
-desc: Mol_building
-log_dir: ./logs/4_nodes
+desc: test_pyg
+log_dir: ./logs/actor_critic
 device: cpu
 seed: 42
-validate_every: 100
+validate_every: 50
 checkpoint_every: null
 store_all_checkpoints: false
-print_every: 10
+print_every: 5
 start_at_step: 0
-num_final_gen_steps: 10
+num_final_gen_steps: 5
 num_validation_gen_steps: 5
-num_training_steps: 1000
+num_training_steps: 200
 num_workers: 0
 hostname: 1845cd3d3c4a
 pickle_mp_messages: false
@@ -17,7 +17,7 @@ git_hash: e4f00ac
 overwrite_existing_exp: true
 
 algo:
-  method: TB
+  method: PPO
   num_from_policy: 64
   num_from_dataset: 0
   valid_num_from_policy: 64
@@ -33,7 +33,7 @@ algo:
     reward_loss_multiplier: 1.0
     variant: TB
     do_correct_idempotent: false
-    do_parameterize_p_b: True
+    do_parameterize_p_b: false
     do_predict_n: true
     do_sample_p_b: true
     do_length_normalize: false
@@ -46,6 +46,8 @@ algo:
     n_loss: none
     n_loss_multiplier: 1.0
     backward_policy: Uniform
+  ppo: 
+    num_epochs: 1
 model:
   num_layers: 4
   num_emb: 64
@@ -55,14 +57,13 @@ model:
     ln_type: pre
     num_mlp_layers: 1
     concat_heads: true
-opt:
   opt: adam
   learning_rate: 0.0001
   lr_decay: 20000.0
   weight_decay: 1.0e-08
   momentum: 0.9
   clip_grad_type: norm
-  clip_grad_param: 10.0
+  clip_grad_param: 1.0
   adam_eps: 1.0e-08
 task:
   logp:
@@ -72,6 +73,6 @@ cond:
   temperature:
     sample_dist: constant
     dist_params:
-    - 8
-    #- 32
+    - 4
+    #- 6
     num_thermometer_dim: 1

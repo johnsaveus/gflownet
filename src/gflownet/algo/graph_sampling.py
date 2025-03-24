@@ -98,6 +98,7 @@ class GraphSampler:
         fwd_logprob: List[List[Tensor]] = [[] for _ in range(n)]
         bck_logprob: List[List[Tensor]] = [[] for _ in range(n)]
 
+        # Empty graphs
         graphs = [self.env.new() for _ in range(n)]
         done = [False for _ in range(n)]
         # TODO: instead of padding with Stop, we could have a virtual action whose probability
@@ -175,7 +176,21 @@ class GraphSampler:
                     data[i]["is_valid"] = False
             if all(done):
                 break
-
+        # Get indices where value is 1 for each row
+        # for row_idx in range(torch_graphs[0].x.shape[0]):
+        #     ones_indices = torch.where(torch_graphs[0].x[row_idx] == 1)[0]
+        #     print(f"Row {row_idx}: indices where value is 1: {ones_indices.tolist()}")
+        # print(torch_graphs[0])
+        # print(torch_graphs[0].x)
+        # print(torch_graphs[0].edge_index)
+        # print(torch_graphs[0].edge_attr)
+        # print(graphs[0])
+        # print(graphs[0])
+        # print(torch_graphs[0].add_node_mask)
+        # print(torch_graphs[0].set_edge_attr_mask)
+        # print(torch_graphs[0].remove_node_mask)
+        # print(torch_graphs[0].remove_edge_attr_mask)
+        # breakpoint()
         # is_sink indicates to a GFN algorithm that P_B(s) must be 1
 
         # There are 3 types of possible trajectories
@@ -188,12 +203,12 @@ class GraphSampler:
         #  B - ends with an invalid action.  = [..., (g, a), (g, None)],                  = [..., 1, 1]
         #  C - ends at max_len.              = [..., (g, a), (gp, None)],                 = [..., bck(gp), 1]
         # and then P_F(terminal) "must" be 1
-
         for i in range(n):
             # If we're not bootstrapping, we could query the reward
             # model here, but this is expensive/impractical.  Instead
             # just report forward and backward logprobs
             data[i]["fwd_logprob"] = sum(fwd_logprob[i])
+            # data[i]["fwd_logprobs"] = torch.stack(fwd_logpro  b[i]).reshape(-1)
             data[i]["bck_logprob"] = sum(bck_logprob[i])
             data[i]["bck_logprobs"] = torch.stack(bck_logprob[i]).reshape(-1)
             data[i]["result"] = graphs[i]

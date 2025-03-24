@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import IterableDataset
 
-from gflownet import GFNAlgorithm, GFNTask
+from gflownet import GFNAlgorithm, GFNTask, PPOAlgorithm
 from gflownet.config import Config
 from gflownet.data.replay_buffer import ReplayBuffer, detach_and_cpu
 from gflownet.envs.graph_building_env import GraphBuildingEnvContext
@@ -23,7 +23,7 @@ class DataSource(IterableDataset):
         self,
         cfg: Config,
         ctx: GraphBuildingEnvContext,
-        algo: GFNAlgorithm,
+        algo: GFNAlgorithm or PPOAlgorithm,
         task: GFNTask,
         replay_buffer: Optional[ReplayBuffer] = None,
         is_algo_eval: bool = False,

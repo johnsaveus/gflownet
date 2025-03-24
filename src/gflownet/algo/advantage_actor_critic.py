@@ -8,9 +8,10 @@ from gflownet.envs.graph_building_env import GraphBuildingEnv, GraphBuildingEnvC
 from gflownet.utils.misc import get_worker_device
 
 from .graph_sampling import GraphSampler
+from gflownet.trainer import GFNAlgorithm
 
 
-class A2C:
+class A2C(GFNAlgorithm):
     def __init__(
         self,
         env: GraphBuildingEnv,
@@ -50,6 +51,10 @@ class A2C:
         self.sample_temp = 1
         self.do_q_prime_correction = False
         self.graph_sampler = GraphSampler(ctx, env, self.max_len, self.max_nodes, self.sample_temp)
+        self.global_cfg = cfg
+
+    def set_is_eval(self, is_eval: bool):
+        self.is_eval = is_eval
 
     def create_training_data_from_own_samples(
         self, model: nn.Module, n: int, cond_info: Tensor, random_action_prob: float

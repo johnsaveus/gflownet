@@ -49,20 +49,23 @@ torch.manual_seed(42)
 cond_info = temp_cond.sample(10)["encoding"]
 samples = algo.create_training_data_from_own_samples(model=model, n=10, cond_info=cond_info)
 trajectories = [sample["traj"] for sample in samples]
-# valid = [sample["is_valid"] for sample in samples]
+valid = [sample["is_valid"] for sample in samples]
 rdkit_mols = [ctx.graph_to_obj(traj[-1][0]) for traj in trajectories]
-# Calc reward
-# TODO: Automate this
-model = load_model(proxy_dir)
-featurizer = SimpleMoleculeMolGraphFeaturizer()
+print(samples[0]["traj"])
 smiles = [Chem.MolToSmiles(mol) for mol in rdkit_mols]
-test_data = [data.MoleculeDatapoint.from_smi(smile) for smile in smiles]
-test_dset = data.MoleculeDataset(test_data, featurizer=featurizer)
-test_loader = data.build_dataloader(test_dset, shuffle=False)
-trainer = pl.Trainer(logger=None, enable_progress_bar=True, accelerator="cpu", devices=1)
-preds = trainer.predict(model, test_loader)[0]
-print(preds)
-img = Draw.MolToImageFile(rdkit_mols[1], "test.png")
+print(smiles[0])
+# # Calc reward
+# # TODO: Automate this
+# model = load_model(proxy_dir)
+# featurizer = SimpleMoleculeMolGraphFeaturizer()
+# smiles = [Chem.MolToSmiles(mol) for mol in rdkit_mols]
+# test_data = [data.MoleculeDatapoint.from_smi(smile) for smile in smiles]
+# test_dset = data.MoleculeDataset(test_data, featurizer=featurizer)
+# test_loader = data.build_dataloader(test_dset, shuffle=False)
+# trainer = pl.Trainer(logger=None, enable_progress_bar=True, accelerator="cpu", devices=1)
+# preds = trainer.predict(model, test_loader)[0]
+# print(preds)
+# img = Draw.MolToImageFile(rdkit_mols[1], "test.png")
 # img = Draw.MolsToGridImage(
 #     [Chem.MolFromSmiles(mol) for mol in results["smiles"]],
 #     molsPerRow=5,

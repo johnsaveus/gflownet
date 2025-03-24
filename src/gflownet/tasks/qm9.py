@@ -31,7 +31,6 @@ class QM9GapTask(GFNTask):
         self._wrap_model = wrap_model
         self.device = get_worker_device()
         self.models = self.load_task_models(cfg.task.qm9.model_path)
-        self.dataset = dataset
         self.temperature_conditional = TemperatureConditional(cfg)
         self.num_cond_dim = self.temperature_conditional.encoding_size()
         # TODO: fix interface
@@ -92,7 +91,7 @@ class QM9GapTask(GFNTask):
         preds[preds.isnan()] = 1
         preds = (
             self.reward_transform(preds)
-            .clip(1e-4, 2)
+            .clip(1e-4, 10)
             .reshape(
                 -1,
             )
@@ -149,6 +148,8 @@ class QM9GapTrainer(StandardOnlineTrainer):
 
     def setup_data(self):
         self.training_data = QM9Dataset(self.cfg.task.qm9.h5_path, train=True, targets=["gap"])
+        print(len(self.training_data))
+        print("\n\n\n\n\n\n\n\n\n\n")
         self.test_data = QM9Dataset(self.cfg.task.qm9.h5_path, train=False, targets=["gap"])
         self.to_terminate.append(self.training_data.terminate)
         self.to_terminate.append(self.test_data.terminate)

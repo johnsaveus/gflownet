@@ -272,7 +272,6 @@ class FragMolBuildingEnvContext(GraphBuildingEnvContext):
             )
             add_node_mask = add_node_mask * np.ones((x.shape[0], self.num_new_node_values), np.float32)
         stop_mask = zeros((1, 1)) if has_unfilled_attach or not len(g) else ones((1, 1))
-
         data = gd.Data(
             **{
                 k: torch.from_numpy(v)

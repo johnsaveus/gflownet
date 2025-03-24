@@ -101,7 +101,7 @@ __pypackages__/
 ###############
 wandb/
 lightning_logs/
-logs/
+#logs/
 #checkpoints
 gnn_predictor/
 *.ipynb

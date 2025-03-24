@@ -84,13 +84,13 @@ class SQLiteLog:
         cur.close()
 
     def insert_many(self, rows, column_names):
-        assert all(
-            [isinstance(x, str) or not isinstance(x, Iterable) for x in rows[0]]
-        ), "rows must only contain scalars"
+        assert all([isinstance(x, str) or not isinstance(x, Iterable) for x in rows[0]]), (
+            "rows must only contain scalars"
+        )
         if not self._has_results_table:
             self._make_results_table([type(i) for i in rows[0]], column_names)
         cur = self.db.cursor()
-        cur.executemany(f'insert into results values ({",".join("?"*len(rows[0]))})', rows)  # nosec
+        cur.executemany(f"insert into results values ({','.join('?' * len(rows[0]))})", rows)  # nosec
         cur.close()
         self.db.commit()
 

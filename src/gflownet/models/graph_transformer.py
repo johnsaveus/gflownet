@@ -144,7 +144,6 @@ class GraphTransformer(nn.Module):
                 scale, shift = cs[:, : l_h.shape[1]], cs[:, l_h.shape[1] :]
                 o = o + l_h * scale + shift
                 o = o + ff(norm2(o, aug_batch))
-
         o_final = o[: -c.shape[0]]
         glob = torch.cat([gnn.global_mean_pool(o_final, g.batch), o[-c.shape[0] :]], 1)
         return o_final, glob
@@ -284,7 +283,6 @@ class GraphTransformerGFN(nn.Module):
             "edge": edge_embeddings,
             "non_edge": non_edge_embeddings,
         }
-
         graph_out = self.emb2graph_out(graph_embeddings)
         fwd_cat = self._make_cat(g, emb, self.action_type_order)
         if self.do_bck:

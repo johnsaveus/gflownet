@@ -125,12 +125,12 @@ class TrajectoryBalance(GFNAlgorithm):
         # instead give "ABC...Z" as a single input, but grab the logits at every timestep. Only works if using something
         # like a transformer with causal self-attention.
         self.model_is_autoregressive = False
-        assert (
-            self.cfg.backward_policy not in [Backward.Maxent, Backward.GSQL] or self.cfg.n_loss != NLoss.none
-        ), "can't do maxent w/o learning or knowing $n$"
-        assert self.ctx.has_n() or (
-            self.cfg.backward_policy not in [Backward.MaxentA, Backward.GSQLA]
-        ), "can't do analytical maxent/GSQL w/o knowing $n$"
+        assert self.cfg.backward_policy not in [Backward.Maxent, Backward.GSQL] or self.cfg.n_loss != NLoss.none, (
+            "can't do maxent w/o learning or knowing $n$"
+        )
+        assert self.ctx.has_n() or (self.cfg.backward_policy not in [Backward.MaxentA, Backward.GSQLA]), (
+            "can't do analytical maxent/GSQL w/o knowing $n$"
+        )
         assert self.cfg.do_predict_n or self.cfg.n_loss == NLoss.none, "`n_loss != NLoss.none` requires `do_predict_n`"
         self.random_action_prob = [cfg.algo.train_random_action_prob, cfg.algo.valid_random_action_prob]
 
@@ -302,6 +302,10 @@ class TrajectoryBalance(GFNAlgorithm):
         batch: gd.Batch
              A (CPU) Batch object with relevant attributes added
         """
+        # obj = [tj["traj"][-1][0] for tj in trajs]
+        # print(obj[5])
+        # print(obj[10])
+        # print(obj[15])
         if self.model_is_autoregressive:
             torch_graphs = [self.ctx.graph_to_Data(tj["traj"][-1][0]) for tj in trajs]
             actions = [

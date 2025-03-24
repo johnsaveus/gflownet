@@ -131,6 +131,12 @@ class A2CConfig(StrictDataClass):
 
 
 @dataclass
+class PPOConfig(StrictDataClass):
+    num_epochs: int = 3
+    invalid_penalty: float = -10
+
+
+@dataclass
 class FMConfig(StrictDataClass):
     epsilon: float = 1e-38
     balanced_loss: bool = False
@@ -201,3 +207,4 @@ class AlgoConfig(StrictDataClass):
     a2c: A2CConfig = field(default_factory=A2CConfig)
     fm: FMConfig = field(default_factory=FMConfig)
     sql: SQLConfig = field(default_factory=SQLConfig)
+    ppo: PPOConfig = field(default_factory=PPOConfig)

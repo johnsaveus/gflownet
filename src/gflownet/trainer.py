@@ -17,7 +17,7 @@ from rdkit import RDLogger
 from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
 
-from gflownet import GFNAlgorithm, GFNTask
+from gflownet import GFNAlgorithm, GFNTask, PPOAlgorithm
 from gflownet.data.data_source import DataSource
 from gflownet.data.replay_buffer import ReplayBuffer
 from gflownet.envs.graph_building_env import GraphActionCategorical, GraphBuildingEnv, GraphBuildingEnvContext
@@ -219,10 +219,23 @@ class GFNTrainer:
         tick = time.time()
         self.model.train()
         try:
-            loss, info = self.algo.compute_batch_losses(self.model, batch)
-            if not torch.isfinite(loss):
-                raise ValueError("loss is not finite")
-            step_info = self.step(loss)
+            if self.cfg.algo.method == "PPO":
+                _, cond_info, num_trajs, batch_idx, logprob, rewards, batch, dev = self.algo.get_inner_loop_constants(
+                    self.model, batch
+                )
+                for _ in range(self.cfg.algo.ppo.num_epochs):
+                    inner_loss, info = self.algo.compute_batch_losses_ppo(
+                        self.model, cond_info, num_trajs, batch_idx, logprob, rewards, batch, dev
+                    )
+                    step_info = self.step(inner_loss)
+                    if not torch.isfinite(inner_loss):
+                        raise ValueError("loss is not finite")
+                loss = inner_loss.mean() / self.cfg.algo.ppo.num_epochs
+            else:
+                loss, info = self.algo.compute_batch_losses(self.model, batch)
+                step_info = self.step(loss)
+                if not torch.isfinite(loss):
+                    raise ValueError("loss is not finite")
             self.algo.step()  # This also isn't used anywhere?
             if self._validate_parameters and not all([torch.isfinite(i).all() for i in self.model.parameters()]):
                 raise ValueError("parameters are not finite")
@@ -242,6 +255,7 @@ class GFNTrainer:
         tick = time.time()
         self.model.eval()
         loss, info = self.algo.compute_batch_losses(self.model, batch)
+        print(info)
         if hasattr(batch, "extra_info"):
             info.update(batch.extra_info)
         info["eval_time"] = time.time() - tick

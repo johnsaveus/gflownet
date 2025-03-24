@@ -11,6 +11,7 @@ from gflownet.algo.advantage_actor_critic import A2C
 from gflownet.algo.flow_matching import FlowMatching
 from gflownet.algo.soft_q_learning import SoftQLearning
 from gflownet.algo.trajectory_balance import TrajectoryBalance
+from gflownet.algo.proximal_policy import PPO
 from gflownet.data.replay_buffer import ReplayBuffer
 from gflownet.models.graph_transformer import GraphTransformerGFN
 
@@ -31,7 +32,7 @@ class StandardOnlineTrainer(GFNTrainer):
             self.ctx,
             self.cfg,
             do_bck=self.cfg.algo.tb.do_parameterize_p_b,
-            num_graph_out=self.cfg.algo.tb.do_predict_n + 1,
+            # num_graph_out=self.cfg.algo.tb.do_predict_n,  # + 1,  # Dont foget that+ 1,
         )
 
     def setup_algo(self):
@@ -44,6 +45,8 @@ class StandardOnlineTrainer(GFNTrainer):
             algo = A2C
         elif algo == "SQL":
             algo = SoftQLearning
+        elif algo == "PPO":
+            algo = PPO
         else:
             raise ValueError(algo)
         self.algo = algo(self.env, self.ctx, self.cfg)

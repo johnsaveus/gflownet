@@ -19,7 +19,7 @@ class Graph(nx.Graph):
         return repr(self)
 
     def __repr__(self):
-        return f'<{list(self.nodes)}, {list(self.edges)}, {list(self.nodes[i]["v"] for i in self.nodes)}>'
+        return f"<{list(self.nodes)}, {list(self.edges)}, {list(self.nodes[i]['v'] for i in self.nodes)}>"
 
     def bridges(self):
         return list(nx.bridges(self))

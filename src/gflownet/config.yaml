@@ -17,7 +17,7 @@ git_hash: e4f00ac
 overwrite_existing_exp: true
 
 algo:
-  method: TB
+  method: A2C
   num_from_policy: 64
   num_from_dataset: 0
   valid_num_from_policy: 64

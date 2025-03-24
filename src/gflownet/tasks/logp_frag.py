@@ -135,8 +135,8 @@ def main():
     import wandb
 
     # Need to init and GFNTrainer will automatically log to wandb
-    wandb.login()
-    wandb.init(project="gflow_test")
+    # wandb.login()
+    # wandb.init(project="gflow_test")
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logp.yaml")
     config = yml2cfg(file_path)
     trial = LogPTrainer(config)
@@ -145,7 +145,7 @@ def main():
     # from gflownet.utils.sqlite_log import read_all_results
 
     # results = read_all_results(config.log_dir + "/valid")
-    wandb.finish()
+    # wandb.finish()
     # Need to decide what to log in wandb
     # 1) online_loss which is the same as tb_loss
     # 2) sampled_reward_avg

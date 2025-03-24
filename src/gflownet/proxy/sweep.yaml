@@ -1,0 +1,26 @@
+program: main.py
+
+method: random
+
+project: gflownet_logp_proxy
+entity: ioannis-savvas00-national-technical-university-of-athens
+
+metric:
+  name: val_loss
+  goal: minimize
+
+parameters:
+  learning_rate:
+    values: [0.0001, 0.0005, 0.001]
+  batch_size:
+    values: [64, 128, 256]
+  gnn_layers:
+    values: [2, 3, 4]
+  gnn_channels:
+    values: [32, 64, 128]
+  heads:
+    values: [2, 4, 6, 8]
+  mlp_layers:
+    values: [1, 2, 3]
+  dropout_proba: 
+    values: [0.1, 0.2, 0.3]

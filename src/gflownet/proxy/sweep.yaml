@@ -10,16 +10,12 @@ metric:
   goal: minimize
 
 parameters:
-  learning_rate:
-    values: [0.0001, 0.0005, 0.001]
-  batch_size:
-    values: [64, 128, 256]
   gnn_layers:
-    values: [2, 3, 4]
+    values: [3, 4]
   gnn_channels:
-    values: [32, 64, 128]
+    values: [64, 128]
   heads:
-    values: [2, 4, 6, 8]
+    values: [8, 16]
   mlp_layers:
     values: [1, 2, 3]
   dropout_proba: 

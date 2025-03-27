@@ -95,6 +95,16 @@ def smiles2graph(mol, y=None):
     return data
 
 
+def random_split(frac_train, smiles):
+    from sklearn.model_selection import train_test_split
+
+    frac_valid_test = 1 - frac_train
+    train, valid_test = train_test_split(smiles, test_size=frac_valid_test, random_state=42)
+    valid, test = train_test_split(valid_test, test_size=0.5, random_state=42)
+
+    return train.index, valid.index, test.index
+
+
 def scaffold_split(frac_train, frac_valid, smiles, include_chirality=False):
     """Taken from deepchem"""
 

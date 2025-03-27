@@ -70,7 +70,7 @@ def plot_results(preds, true):
     plt.ylabel("Predicted LogP", fontsize=14)
     # plt.title("True vs Predicted Values", fontsize=16)
     # plt.grid(True)
-    plt.savefig("results.png", bbox_inches="tight")
+    plt.savefig("results/true_vs_predicted_test_set.png", bbox_inches="tight")
 
 
 def data_from_loader(data, device):

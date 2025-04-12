@@ -16,8 +16,8 @@ if __name__ == "__main__":
         argparser = argparse.ArgumentParser(description="GNN for KOW prediction")
         argparser.add_argument("--learning_rate", type=float, default=0.001)
         argparser.add_argument("--batch_size", type=int, default=64)
-        argparser.add_argument("--gnn_layers", type=int, default=3)
-        argparser.add_argument("--gnn_channels", type=int, default=128)
+        argparser.add_argument("--gnn_layers", type=int, default=2)
+        argparser.add_argument("--gnn_channels", type=int, default=64)
         argparser.add_argument("--heads", type=int, default=8)
         argparser.add_argument("--mlp_layers", type=int, default=2)
         argparser.add_argument("--dropout_proba", type=float, default=0.2)
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     # ------------  Load data
-    data_url = r"https://raw.githubusercontent.com/CesareWang/Predictors-for-15-Environmental-Endpoints/main/predictors/data/KOW.csv"
+    data_url = r"https://raw.githubusercontent.com/CesareWang/Predictors-for-15-Environmental-Endpoints/main/predictors/data/SW.csv"
     kow_data = pd.read_csv(data_url, index_col=0)
     kow_data.rename(columns={"active": "logKOW"}, inplace=True)
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # --------------- Training configs
     epochs = 150
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.1, patience=10, verbose=True)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=10, verbose=True)
 
     # --------------- Training
     best_loss = 1000
@@ -92,11 +92,11 @@ if __name__ == "__main__":
         val_loss = eval_epoch(model, val_loader, device)
         if val_loss < best_loss:
             best_loss = val_loss
-            torch.save(model.state_dict(), f"best_model.pt")
+            torch.save(model.state_dict(), f"best_model_sol.pt")
         # wandb.log({"train_loss": train_loss, "val_loss": val_loss})
         print(f"Epoch: {epoch}, Train Loss: {train_loss}, Val Loss: {val_loss}")
 
-    torch.save(model.state_dict(), "final_model.pt")
+    torch.save(model.state_dict(), "final_model_sol.pt")
     # Inference
     all_preds, all_true = infer_model(model, te_loader, device)
     rmse, mae, r2 = get_metrics(all_preds, all_true)

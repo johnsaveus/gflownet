@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from torch_geometric.nn.pool import global_add_pool
 from torch_geometric.nn import GATConv
@@ -105,3 +106,40 @@ class FullyConnected(nn.Module):
                 x = self.activation(x)
                 x = self.dropout(x)
         return x
+
+
+def load_proxy_to_gflow(path):
+    model = GraphAttention(
+        node_feats=29,
+        edge_dim=7,
+        gnn_layers=3,
+        gnn_channels=128,
+        heads=8,
+        dropout_proba=0.2,
+        gnn_norm=False,
+        mlp_layers=2,
+        mlp_channels=128,
+        mlp_norm=False,
+    )
+    model.load_state_dict(torch.load(path, map_location=torch.device("cpu")))
+    model.eval()
+    return model
+
+
+def load_proxy_to_gflow_sol(path):
+    model = GraphAttention(
+        node_feats=29,
+        edge_dim=7,
+        gnn_layers=2,
+        gnn_channels=64,
+        heads=8,
+        dropout_proba=0.2,
+        gnn_norm=False,
+        mlp_layers=2,
+        mlp_channels=64,
+        mlp_norm=False,
+    )
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.load_state_dict(torch.load(path, map_location=device))
+    model.eval()
+    return model

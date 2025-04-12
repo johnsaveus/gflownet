@@ -1,0 +1,13 @@
+
+
+CHECK 
+* Modes (Tanimoto) - Trajectories sampled
+* Modes (Scaffold) - Trajectories sampled
+
+TODO
+* Effect of b on 
+* p(R) - R plot of sampled traj
+* Reward average - Trajectories sampled
+
+* Do tuning with hyperparameter b and then make plots for each algo used and b
+* After the best b, do 3 runs with different seeds to get mean and std 

@@ -16,8 +16,8 @@ if __name__ == "__main__":
         argparser = argparse.ArgumentParser(description="GNN for KOW prediction")
         argparser.add_argument("--learning_rate", type=float, default=0.001)
         argparser.add_argument("--batch_size", type=int, default=64)
-        argparser.add_argument("--gnn_layers", type=int, default=3)
-        argparser.add_argument("--gnn_channels", type=int, default=128)
+        argparser.add_argument("--gnn_layers", type=int, default=2)
+        argparser.add_argument("--gnn_channels", type=int, default=64)
         argparser.add_argument("--heads", type=int, default=8)
         argparser.add_argument("--mlp_layers", type=int, default=2)
         argparser.add_argument("--dropout_proba", type=float, default=0.2)
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     # ------------  Load data
-    data_url = r"https://raw.githubusercontent.com/CesareWang/Predictors-for-15-Environmental-Endpoints/main/predictors/data/KOW.csv"
+    data_url = r"https://raw.githubusercontent.com/CesareWang/Predictors-for-15-Environmental-Endpoints/main/predictors/data/SW.csv"
     kow_data = pd.read_csv(data_url, index_col=0)
     kow_data.rename(columns={"active": "logKOW"}, inplace=True)
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         mlp_norm=False,
     ).to(device)
 
-    model.load_state_dict(torch.load("best_model.pt", map_location=torch.device("cpu")))
+    model.load_state_dict(torch.load("best_model_sol.pt", map_location=torch.device("cpu")))
     model.eval()
 
     # Train metrics
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         "validation": {"RMSE": rmse_val, "MAE": mae_val, "R2": r2_val},
         "test": {"RMSE": rmse_test, "MAE": mae_test, "R2": r2_test},
     }
-    with open("results/metrics.json", "w") as f:
+    with open("results/metrics_sol.json", "w") as f:
         json.dump(metrics, f, indent=4)
 
     plot_results(all_preds, all_true)

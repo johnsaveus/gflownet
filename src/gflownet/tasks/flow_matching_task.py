@@ -48,7 +48,7 @@ class FlowMatchingTask(GFNTask):
 
     def reward_transform(self, y: Union[float, Tensor]) -> ObjectProperties:
         """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar"""
-        flat_r = (1 - ((y - self.min_logp) / self.width)) * 10
+        flat_r = 1 - ((y - self.min_logp) / self.width)
         return ObjectProperties(flat_r)
 
     def _load_task_models(self):
@@ -90,7 +90,7 @@ class SEHFragTrainer(StandardOnlineTrainer):
         cfg.hostname = socket.gethostname()
         cfg.pickle_mp_messages = False
         cfg.num_workers = 8
-        cfg.opt.learning_rate = 1e-4
+        cfg.opt.learning_rate = 5e-4
         cfg.opt.weight_decay = 1e-8
         cfg.opt.momentum = 0.9
         cfg.opt.adam_eps = 1e-8
@@ -100,17 +100,20 @@ class SEHFragTrainer(StandardOnlineTrainer):
         cfg.algo.num_from_policy = 64
 
         cfg.num_training_steps = 5000
-        cfg.validate_every = 100
+        cfg.validate_every = 250
         # Need to output a lot of molecules to get a good estimate of the reward
-        cfg.num_final_gen_steps = 50
+        cfg.num_final_gen_steps = 100
 
         cfg.algo.method = "FM"
-        cfg.algo.max_nodes = 8
-        cfg.algo.sampling_tau = 0.05
+        cfg.algo.max_nodes = 6
+        cfg.algo.sampling_tau = 0.1
         cfg.algo.illegal_action_logreward = -75
         cfg.algo.train_random_action_prob = 0.05
         cfg.algo.valid_random_action_prob = 0.05
-        cfg.algo.valid_num_from_policy = 100
+        cfg.algo.train_det_after = 3000
+        cfg.algo.valid_num_from_policy = 5000
+        cfg.algo.valid_num_from_policy = 64
+        cfg.algo.fm.leaf_coef = 1
         cfg.num_validation_gen_steps = 10
 
         # b where R^b where b is constant as in the first paper
@@ -124,10 +127,10 @@ class SEHFragTrainer(StandardOnlineTrainer):
 
         cfg.overwrite_existing_exp = True
 
-        cfg.model.num_emb = 128
+        cfg.model.num_emb = 64
         cfg.model.num_layers = 4
-        cfg.model.graph_transformer.num_heads = 2
-        cfg.model.graph_transformer.num_mlp_layers = 1
+        cfg.model.graph_transformer.num_heads = 4
+        cfg.model.graph_transformer.num_mlp_layers = 2
 
     def setup_task(self):
         self.task = FlowMatchingTask(
@@ -152,10 +155,23 @@ class SEHFragTrainer(StandardOnlineTrainer):
 def main():
     """Example of how this model can be run."""
 
+    import random
+    import wandb
+
     config = init_empty(Config())
-    config.log_dir = "./logs/min_logp"
+    config.log_dir = "./logs/fm_experiment(lr=5e-4)"
+    seed = 42
+    wandb.login()
+    wandb.init(project="flow_matching", config=config)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
     trial = SEHFragTrainer(config)
     trial.run()
+    wandb.finish()
 
 
 if __name__ == "__main__":

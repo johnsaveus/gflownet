@@ -188,11 +188,11 @@ class GraphSampler:
         #  B - ends with an invalid action.  = [..., (g, a), (g, None)],                  = [..., 1, 1]
         #  C - ends at max_len.              = [..., (g, a), (gp, None)],                 = [..., bck(gp), 1]
         # and then P_F(terminal) "must" be 1
-
         for i in range(n):
             # If we're not bootstrapping, we could query the reward
             # model here, but this is expensive/impractical.  Instead
             # just report forward and backward logprobs
+            data[i]["fwd_prod"] = fwd_logprob[i]
             data[i]["fwd_logprob"] = sum(fwd_logprob[i])
             data[i]["bck_logprob"] = sum(bck_logprob[i])
             data[i]["bck_logprobs"] = torch.stack(bck_logprob[i]).reshape(-1)

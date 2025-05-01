@@ -21,6 +21,7 @@ from gflownet.utils.misc import get_worker_device
 from gflownet.utils.transforms import to_logreward
 from gflownet.proxy.mol_utils import smiles2graph
 from gflownet.proxy.model import load_proxy_to_gflow, load_proxy_to_gflow_sol
+from gflownet.algo.trajectory_balance import TBVariant, Backward
 
 
 class TrajectoryBalanceTask(GFNTask):
@@ -48,7 +49,7 @@ class TrajectoryBalanceTask(GFNTask):
 
     def reward_transform(self, y: Union[float, Tensor]) -> ObjectProperties:
         """Transforms a target quantity y (e.g. the LUMO energy in QM9) to a positive reward scalar"""
-        flat_r = (1 - ((y - self.min_logp) / self.width)) * 10
+        flat_r = 1 - ((y - self.min_logp) / self.width)
         return ObjectProperties(flat_r)
 
     def _load_task_models(self):
@@ -70,7 +71,7 @@ class TrajectoryBalanceTask(GFNTask):
         preds = self.models["logp"](batch["x"], batch["edge_index"], batch["edge_attr"], batch["batch"])
         preds[preds.isnan()] = 0
         preds = self.reward_transform(preds).reshape((-1,)).data.cpu()
-        return preds.clip(1e-4, 10).reshape((-1,))
+        return preds.clip(1e-4, 2).reshape((-1,))
 
     def compute_obj_properties(self, mols: List[RDMol]) -> Tuple[ObjectProperties, Tensor]:
         graphs = [smiles2graph(i) for i in mols]
@@ -100,18 +101,20 @@ class SEHFragTrainer(StandardOnlineTrainer):
         cfg.algo.num_from_policy = 64
 
         cfg.num_training_steps = 5000
-        cfg.validate_every = 100
+        cfg.validate_every = 250
         # Need to output a lot of molecules to get a good estimate of the reward
         cfg.num_final_gen_steps = 100
 
         cfg.algo.method = "TB"
-        cfg.algo.max_nodes = 8
-        cfg.algo.sampling_tau = 0.05
+        cfg.algo.tb.variant = TBVariant.TB
+        cfg.algo.max_nodes = 6
+        cfg.algo.sampling_tau = 0.1  # ??
         cfg.algo.illegal_action_logreward = -75
         cfg.algo.train_random_action_prob = 0.05
+        cfg.algo.train_det_after = 3000
         cfg.algo.valid_random_action_prob = 0.05
-        cfg.algo.valid_num_from_policy = 100
-        cfg.algo.tb.Z_learning_rate = 0.001
+        cfg.algo.valid_num_from_policy = 64
+        cfg.algo.tb.Z_learning_rate = 0.01
         cfg.num_validation_gen_steps = 10
 
         # b where R^b where b is constant as in the first paper
@@ -125,10 +128,10 @@ class SEHFragTrainer(StandardOnlineTrainer):
 
         cfg.overwrite_existing_exp = True
 
-        cfg.model.num_emb = 128
+        cfg.model.num_emb = 64
         cfg.model.num_layers = 4
-        cfg.model.graph_transformer.num_heads = 2
-        cfg.model.graph_transformer.num_mlp_layers = 1
+        cfg.model.graph_transformer.num_heads = 4
+        cfg.model.graph_transformer.num_mlp_layers = 2
 
     def setup_task(self):
         self.task = TrajectoryBalanceTask(
@@ -154,10 +157,13 @@ def main():
     """Example of how this model can be run."""
 
     config = init_empty(Config())
-    config.log_dir = "./logs/min_sol"
+    config.log_dir = "./logs/tb_(z_lr=1e-2)"
     seed = 42
     import random
+    import wandb
 
+    wandb.login()
+    wandb.init(project="all_runs", config=config)
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -166,6 +172,7 @@ def main():
     torch.backends.cudnn.deterministic = True
     trial = SEHFragTrainer(config)
     trial.run()
+    wandb.finish()
 
 
 if __name__ == "__main__":

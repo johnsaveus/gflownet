@@ -256,7 +256,7 @@ class QM9MOOTrainer(QM9GapTrainer):
             assert cond_cfg.weighted_prefs.preference_type is None, (
                 f"Cannot use preferences with multiple focus regions, "
                 f"here focus_type={cond_cfg.focus_region.focus_type} "
-                f"and preference_type={cond_cfg.weighted_prefs.preference_type }"
+                f"and preference_type={cond_cfg.weighted_prefs.preference_type}"
             )
 
         if isinstance(cond_cfg.focus_region.focus_type, list) and len(cond_cfg.focus_region.focus_type) > 1:

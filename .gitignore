@@ -10,7 +10,7 @@ __pycache__/
 # C extensions
 *.so
 
-logs/
+#logs/   
 wandb/
 # Distribution / packaging
 .Python

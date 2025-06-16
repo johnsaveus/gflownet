@@ -1,0 +1,3 @@
+db_lr(1e-4): Pearson r = 0.2970, Spearman r = 0.5244
+db_lr(5e-4): Pearson r = 0.6102, Spearman r = 0.6061
+db_lr(1e-3): Pearson r = 0.6214, Spearman r = 0.6185

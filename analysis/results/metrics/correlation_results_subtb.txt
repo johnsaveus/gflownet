@@ -1,0 +1,3 @@
+subtb_lr(1e-4): Pearson r = 0.3912, Spearman r = 0.5428
+subtb_lr(5e-4): Pearson r = 0.6208, Spearman r = 0.6005
+subtb_lr(1e-3): Pearson r = 0.5689, Spearman r = 0.6006

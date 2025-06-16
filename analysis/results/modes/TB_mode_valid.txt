@@ -1,0 +1,8 @@
+Similarity_Threshold	Reward_Threshold	Final_Mode_Count
+Uniqueness: 99.96%
+0.3	0.7	91
+0.3	0.8	29
+0.4	0.7	417
+0.4	0.8	104
+0.5	0.7	936
+0.5	0.8	240

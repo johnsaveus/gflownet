@@ -91,7 +91,7 @@ class SEHFragTrainer(StandardOnlineTrainer):
         cfg.hostname = socket.gethostname()
         cfg.pickle_mp_messages = False
         cfg.num_workers = 8
-        cfg.opt.learning_rate = 1e-3
+        cfg.opt.learning_rate = 1e-4
         cfg.opt.weight_decay = 1e-8
         cfg.opt.momentum = 0.9
         cfg.opt.adam_eps = 1e-8
@@ -107,6 +107,7 @@ class SEHFragTrainer(StandardOnlineTrainer):
 
         cfg.algo.method = "TB"
         cfg.algo.tb.variant = TBVariant.DB
+        cfg.algo.tb.do_parameterize_p_b = True
         cfg.algo.max_nodes = 6
         cfg.algo.sampling_tau = 0.1  # ??
         cfg.algo.illegal_action_logreward = -75
@@ -157,7 +158,7 @@ def main():
     """Example of how this model can be run."""
 
     config = init_empty(Config())
-    config.log_dir = "./logs/db_lr(1e-3)"
+    config.log_dir = "./logs/db_(pb,lr=1e-4)"
     seed = 42
     import random
     import wandb

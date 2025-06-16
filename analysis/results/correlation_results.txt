@@ -1,0 +1,4 @@
+FM: Pearson r = 0.3769, Spearman r = 0.4763
+DB: Pearson r = 0.2970, Spearman r = 0.5244
+TB: Pearson r = 0.3794, Spearman r = 0.6067
+SUBTB: Pearson r = 0.3912, Spearman r = 0.5428

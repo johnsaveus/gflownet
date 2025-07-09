@@ -110,6 +110,9 @@ class GraphTransformer(nn.Module):
             x = torch.cat([g.x, torch.rand(g.x.shape[0], self.num_noise, device=g.x.device)], 1)
         else:
             x = g.x
+        # print(g.x)
+        # print(g.edge_attr)
+        # print(g.edge_index)
         o = self.x2h(x)
         e = self.e2h(g.edge_attr)
         c = self.c2h(cond if cond is not None else torch.ones((g.num_graphs, 1), device=g.x.device))

@@ -392,7 +392,7 @@ def main():
     config.algo.num_from_policy = 2
     config.validate_every = 1
     config.num_final_gen_steps = 5
-    config.num_training_steps = 3
+    config.num_training_steps = 100
     config.pickle_mp_messages = True
     config.overwrite_existing_exp = True
     config.algo.sampling_tau = 0.95

@@ -138,6 +138,7 @@ class GraphSampler:
             else:
                 actions = fwd_cat.sample()
             graph_actions = [self.ctx.ActionIndex_to_GraphAction(g, a) for g, a in zip(torch_graphs, actions)]
+            # print(graph_actions)
             log_probs = fwd_cat.log_prob(actions)
             # Step each trajectory, and accumulate statistics
             for i, j in zip(not_done(range(n)), range(n)):

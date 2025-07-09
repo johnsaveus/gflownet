@@ -1,4 +1,4 @@
-FM: Pearson r = 0.5045, Spearman r = 0.4958, cross-entropy = 12.1078
-DB: Pearson r = 0.6214, Spearman r = 0.6185, cross-entropy = 27.3582
-TB: Pearson r = 0.6510, Spearman r = 0.6331, cross-entropy = 16.2714
-SubTB: Pearson r = 0.6208, Spearman r = 0.6005, cross-entropy = 11.5885
+FM: Pearson r = 0.5045, Pearson p = 0.0000, Spearman r = 0.4958, spearman p = 0.0000, cross-entropy = 12.1078
+DB: Pearson r = 0.6214, Pearson p = 0.0000, Spearman r = 0.6185, spearman p = 0.0000, cross-entropy = 27.3582
+TB: Pearson r = 0.6510, Pearson p = 0.0000, Spearman r = 0.6331, spearman p = 0.0000, cross-entropy = 16.2714
+SubTB: Pearson r = 0.6208, Pearson p = 0.0000, Spearman r = 0.6005, spearman p = 0.0000, cross-entropy = 11.5885
